@@ -1,0 +1,31 @@
+{
+  "name": "@cloudflare_system/workers",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.ts",
+  "scripts": {
+    "dev": "wrangler dev main.ts ",
+    "build": "npx tsc && wrangler deploy",
+    "inits": "npx prisma migrate dev --name init",
+    "transfer": "npx wrangler d1 migrations create dwz create_user_table",
+    "diff": "npx prisma migrate diff --from-empty --to-schema-datamodel ./prisma/schema.prisma --script > migrations/0006_create_user_table.sql",
+    "apply:local": "npx wrangler d1 migrations apply dwz --local",
+    "apply:remote": "npx wrangler d1 migrations apply dwz --remote"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/crypto-js": "^4.2.2",
+    "@types/node": "^22.5.2",
+    "prisma": "^5.19.0",
+    "wrangler": "^3.72.3"
+  },
+  "dependencies": {
+    "@prisma/adapter-d1": "^5.19.0",
+    "@prisma/client": "^5.19.0",
+    "crypto-js": "^4.2.0",
+    "hono": "^4.5.10",
+    "typescript": "^5.5.4"
+  }
+}

@@ -1,0 +1,8 @@
+name = "dwzworkers" # todo
+main = "./dist/main.js"
+compatibility_date = "2022-10-10"
+
+[[d1_databases]]
+binding = "DB"  
+database_name = "dwz"
+database_id = "1aec3342-ad01-4ddc-801f-9d6471b30811"

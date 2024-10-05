@@ -1,0 +1,9 @@
+-- CreateTable
+CREATE TABLE "Visit" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "linkId" TEXT NOT NULL,
+    "ipAddress" TEXT NOT NULL,
+    "country" TEXT NOT NULL,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "Visit_linkId_fkey" FOREIGN KEY ("linkId") REFERENCES "Link" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
