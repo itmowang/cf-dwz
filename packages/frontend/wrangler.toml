@@ -2,4 +2,4 @@ name = "dwzages"
 pages_build_output_dir = "./dist"
 compatibility_date = "2024-10-12"
 send_metrics = false
-branch = "master"
+branch = "production"
