@@ -3,10 +3,12 @@ import { createRouter, createWebHistory } from 'vue-router';
 const router = createRouter({
     history: createWebHistory(),
     routes: [
+        { path: '/:short',name: 'shortUrl', meta: { layout: 'landing',isShort: true } },
         {
             path: '/',
             component: AppLayout,
             children: [
+
                 {
                     path: '/',
                     name: 'dashboard',
@@ -16,6 +18,11 @@ const router = createRouter({
                     path: '/uikit/url',
                     name: 'url',
                     component: () => import('@/views/uikit/url.vue')
+                },
+                {
+                    path: '/uikit/create',
+                    name: 'create',
+                    component: () => import('@/views/uikit/createUrl.vue')
                 }
 
             ]
@@ -57,11 +64,11 @@ const router = createRouter({
 const whiteList = ['/auth/login', '/auth/register', '/auth/access', '/auth/error'];
 
 
+
 router.beforeEach((to, from) => {
 
+
     const token = localStorage.getItem('token');
-
-
    if(whiteList.some((path)=>path == to.path)){
     return true
    }else{

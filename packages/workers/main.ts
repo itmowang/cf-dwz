@@ -1,39 +1,33 @@
+import { Hono } from "hono";
+import user from "./src/user";
+import link from "./src/link";
+import { jwt } from "hono/jwt";
+import { cors } from 'hono/cors' 
 
-import { Hono } from 'hono'
-import user from './src/user'
+const app = new Hono().basePath("/api");
 
+app.use('*', cors())
 
+app.use(
+  "/link/*",jwt({ secret: "mowang",})
+);
 
-const app = new Hono().basePath('/api')
+app.get("/", (c) => c.text("GET /"));
+app.post("/", (c) => c.text("POST /"));
+app.put("/", (c) => c.text("PUT /"));
+app.delete("/", (c) => c.text("DELETE /"));
 
-// app.get('/userss', async (c) => {
-//     const env = c.env as Env; // 确保正确类型
-//     const adapter = new PrismaD1(env.DB);
-//     const prisma = new PrismaClient({ adapter });
-  
-//     try {
-//       const users = await prisma.user.findMany(); // 获取所有用户
-//       return c.json(users);
-//     } catch (error) {
-//       return c.json({ error: 'Failed to fetch users' }, 500);
-//     }
-// });
-
-app.get('/', (c) => c.text('GET /'))
-app.post('/', (c) => c.text('POST /'))
-app.put('/', (c) => c.text('PUT /'))
-app.delete('/', (c) => c.text('DELETE /'))
-
-// user routes
-user(app,'/user')
+//  routes
+user(app, "/user");
+link(app, "/link");
 
 app.notFound((c) => {
-    return c.text('Custom 404 Message', 404)
-})
+  return c.text("Custom 404 Message", 404);
+});
 
 app.onError((err, c) => {
-    console.error(`${err}`)
-    return c.text('Custom Error Message', 500)
-})
+  console.error(`${err}`);
+  return c.text("Custom Error Message", 500);
+});
 
-export default app
+export default app;

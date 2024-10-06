@@ -54,13 +54,13 @@ export default (app: Hono, path: string) => {
             } else {
                 if (user.password === md5(password).toString()) {
                     const token = await sign({
-                        email
-                    }, 'your-secret-key')
+                        email,
+                        id: user.id
+                    }, 'mowang')
                     return c.json({
                         status: 200,
                         data: {
-                            userInfo: { ...user, password: null }
-                            , token
+                            userInfo: { ...user, password: null } , token
                         },
                         message: 'login success',
                     })

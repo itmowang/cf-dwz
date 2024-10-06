@@ -24,7 +24,6 @@ model Link {
   shortUrl    String   @unique               // 短网址，唯一
   createdAt   DateTime @default(now())      // 创建时间
   updatedAt   DateTime @updatedAt            // 更新时间
-
   user        User     @relation(fields: [userId], references: [id]) // 关联用户
   visits      Visit[]                          // 访问记录
 }

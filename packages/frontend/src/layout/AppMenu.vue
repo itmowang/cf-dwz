@@ -10,7 +10,9 @@ const model = ref([
     },
     {
         label: 'User',
-        items: [{ label: '短网址管理', icon: 'pi pi-fw pi-id-card', to: '/uikit/url' }]
+        items: [{ label: '创建新的短网址', icon: 'pi pi-fw pi-id-card', to: '/uikit/create' },
+        { label: '短网址管理', icon: 'pi pi-fw pi-id-card', to: '/uikit/url' }
+        ]
     }
 ]);
 </script>
