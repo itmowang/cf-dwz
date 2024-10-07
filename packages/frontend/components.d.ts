@@ -23,6 +23,7 @@ declare module 'vue' {
     RouterView: typeof import('vue-router')['RouterView']
     SelectButton: typeof import('primevue/selectbutton')['default']
     ShortUrl: typeof import('./src/components/ShortUrl.vue')['default']
+    TieredMenu: typeof import('primevue/tieredmenu')['default']
     Toast: typeof import('primevue/toast')['default']
   }
   export interface ComponentCustomProperties {

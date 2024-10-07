@@ -23,6 +23,11 @@ const router = createRouter({
                     path: '/uikit/create',
                     name: 'create',
                     component: () => import('@/views/uikit/createUrl.vue')
+                },
+                {
+                    path: '/uikit/logs',
+                    name: 'logs',
+                    component: () => import('@/views/uikit/logs.vue')
                 }
 
             ]

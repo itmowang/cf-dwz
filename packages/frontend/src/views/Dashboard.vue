@@ -1,7 +1,8 @@
 <script setup>
 import { useLayout } from '@/layout/composables/layout';
 import { ProductService } from '@/service/ProductService';
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, ref, watch, reactive } from 'vue';
+import { getDashboard } from '@/api/info';
 
 const { getPrimary, getSurface, isDarkTheme } = useLayout();
 
@@ -9,12 +10,24 @@ const products = ref(null);
 const chartData = ref(null);
 const chartOptions = ref(null);
 
+const state = reactive({
+    dwz_count: 0
+});
+
 const items = ref([
     { label: 'Add New', icon: 'pi pi-fw pi-plus' },
     { label: 'Remove', icon: 'pi pi-fw pi-trash' }
 ]);
 
-onMounted(() => {
+const getDashboardData = async () => {
+    const res = await getDashboard({});
+    if(res.status === 200){
+        state.dwz_count = res.data.my_dwz_count
+    }
+}
+
+onMounted(async () => {
+    await getDashboardData();
     ProductService.getProductsSmall().then((data) => (products.value = data));
     chartData.value = setChartData();
     chartOptions.value = setChartOptions();
@@ -107,7 +120,7 @@ watch([getPrimary, getSurface, isDarkTheme], () => {
                 <div class="flex justify-between mb-4">
                     <div>
                         <span class="block text-muted-color font-medium mb-4">我生成的短网址数量</span>
-                        <div class="text-surface-900 dark:text-surface-0 font-medium text-xl">152</div>
+                        <div class="text-surface-900 dark:text-surface-0 font-medium text-xl">{{state.dwz_count}}</div>
                     </div>
                     <div class="flex items-center justify-center bg-blue-100 dark:bg-blue-400/10 rounded-border" style="width: 2.5rem; height: 2.5rem">
                         <i class="pi pi-shopping-cart text-blue-500 !text-xl"></i>

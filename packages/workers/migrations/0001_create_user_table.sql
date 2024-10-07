@@ -1,5 +1,5 @@
 -- CreateTable
-CREATE TABLE "User" (
+CREATE TABLE IF NOT EXISTS "User" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
@@ -8,7 +8,7 @@ CREATE TABLE "User" (
 );
 
 -- CreateTable
-CREATE TABLE "Link" (
+CREATE TABLE IF NOT EXISTS "Link" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "userId" TEXT NOT NULL,
     "originalUrl" TEXT NOT NULL,
@@ -19,7 +19,7 @@ CREATE TABLE "Link" (
 );
 
 -- CreateTable
-CREATE TABLE "Visit" (
+CREATE TABLE IF NOT EXISTS "Visit" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "linkId" TEXT NOT NULL,
     "ipAddress" TEXT NOT NULL,
@@ -29,8 +29,8 @@ CREATE TABLE "Visit" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+CREATE UNIQUE INDEX IF NOT EXISTS "User_email_key" ON "User"("email");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Link_shortUrl_key" ON "Link"("shortUrl");
+CREATE UNIQUE INDEX IF NOT EXISTS "Link_shortUrl_key" ON "Link"("shortUrl");
 

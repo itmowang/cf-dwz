@@ -1,20 +1,20 @@
 <script setup>
 import { reactive } from 'vue';
-import { getLinkList } from '@/api/link';
+import { dwzPage } from '@/api/link';
 import { onMounted } from 'vue';
 import { useToast } from 'primevue/usetoast';
 
 const toast = useToast();
 
 const state = reactive({
-    dwz_List: []
+    dwz_logs_List: []
 })
 
 
 onMounted(async () => {
-    const res = await getLinkList();
+    const res = await dwzPage();
     if (res.status == 200) {
-        state.dwz_List = res.data;
+        state.dwz_logs_List = res.data.visits || [];
     } else {
         toast.add({ severity: 'error', summary: "Error", detail: "查询网址异常", life: 3000 });
     }
@@ -36,7 +36,7 @@ const shortLabel = (value) => {
 
 <template>
     <Card>
-        <template #title>管理我的短网址</template>
+        <template #title>短网址访问记录</template>
         <template #content>
 
         </template>
@@ -45,26 +45,31 @@ const shortLabel = (value) => {
     <div class="card mt-8">
         <DeferredContent @load="onDataLoad" role="region" aria-live="polite"
             aria-label="Content loaded after page scrolled down">
-            <DataTable :value="state.dwz_List">
+            <DataTable :value="state.dwz_logs_List">
+                <Column header="访问国家">
+                    <template #body="slotProps">
+                        <Button :label="slotProps.data.country" link />
+                    </template>
+                </Column>
                 <Column header="url">
                     <template #body="slotProps">
-                        <Button :label="shortLabel(slotProps.data.shortUrl)" link
-                            @click="toNewLink(`${slotProps.data.shortUrl}`)" />
+                        <Button :label=" shortLabel(slotProps.data.link.shortUrl)" link
+                            @click="toNewLink(`${slotProps.data.link.shortUrl}`)" />
                     </template>
                 </Column>
                 <Column header="目标网址">
                     <template #body="slotProps">
-                        <Button :label="slotProps.data.originalUrl" link @click="toLink(slotProps.data.originalUrl)" />
+                        <Button :label="slotProps.data.link.originalUrl" link @click="toLink(slotProps.data.link.originalUrl)" />
                     </template>
                 </Column>
-                <Column header="当天访问次数">
+                <Column header="访问设备">
                     <template #body="slotProps">
-                        <Button :label="slotProps.data?.todayVisits ||'0'" link />
+                        <Button label="PC" link />
                     </template>
                 </Column>
-                <Column header="本周访问次数">
+                <Column header="访问来源">
                     <template #body="slotProps">
-                        <Button :label="slotProps.data?.weeklyVisits || '0'" link />
+                        <Button label="未知" link />
                     </template>
                 </Column>
             </DataTable>

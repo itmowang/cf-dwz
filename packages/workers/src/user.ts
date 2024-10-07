@@ -1,5 +1,4 @@
 import { jwt, sign } from 'hono/jwt'
-import type { JwtVariables } from 'hono/jwt'
 import { Hono } from 'hono/dist/types/hono';
 import { Context } from 'hono/dist/types/context';
 import Prisma from '../prisma/prisma'
@@ -82,5 +81,4 @@ export default (app: Hono, path: string) => {
 
         }
     })
-
 }
