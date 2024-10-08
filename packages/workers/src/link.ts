@@ -1,6 +1,3 @@
-import { jwt, sign } from "hono/jwt";
-import type { JwtVariables } from "hono/jwt";
-// import { bearerAuth } from "hono/bearer-auth";
 import { Hono } from "hono/dist/types/hono";
 import { Context } from "hono/dist/types/context";
 import Prisma from "../prisma/prisma";
@@ -28,25 +25,83 @@ const shortLink = (url: string) => {
 };
 
 export default (app: Hono, path: string) => {
-  // 当前用户获取短网址列表
+  // 当前用户获取短网址列表 并且列表内查询出 当天访问次数 和本周访问次数
   app.get(`${path}/dwz_list`, async (c: Context) => {
     const payload = c.get("jwtPayload") as JwtPayLoad;
     const prisma = Prisma(c);
+  
+    // 获取当前时间
+    const now = new Date();
+    
+    // 获取当天的开始和结束时间
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const endOfToday = new Date(startOfToday);
+    endOfToday.setDate(endOfToday.getDate() + 1);
+  
+    // 获取本周的开始和结束时间
+    const startOfWeek = new Date(now);
+    startOfWeek.setDate(now.getDate() - now.getDay());
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(endOfWeek.getDate() + 7);
+  
+    // 查询短网址及其访问统计
     const list = await prisma.link.findMany({
       where: {
         userId: payload.id,
       },
+      include: {
+        visits: {
+          where: {
+            createdAt: {
+              gte: startOfToday, // 当天访问
+            },
+          },
+        },
+      },
     });
+  
+    // 处理访问统计
+    const result = list.map(link => {
+      const todayVisits = link.visits.length;
+  
+      // 计算本周访问次数
+      const weeklyVisits = link.visits.filter(visit => 
+        visit.createdAt >= startOfWeek && visit.createdAt < endOfWeek
+      ).length;
+  
+      return {
+        id: link.id,
+        originalUrl: link.originalUrl,
+        shortUrl: link.shortUrl,
+        createdAt: link.createdAt,
+        todayVisits: todayVisits || 0 ,
+        weeklyVisits:weeklyVisits||0,
+      };
+    });
+  
     return c.json({
       status: 200,
-      data: list,
+      data: result,
     });
   });
+  
+  // app.get(`${path}/dwz_list`, async (c: Context) => {
+  //   const payload = c.get("jwtPayload") as JwtPayLoad;
+  //   const prisma = Prisma(c);
+  //   const list = await prisma.link.findMany({
+  //     where: {
+  //       userId: payload.id,
+  //     },
+  //   });
+  //   return c.json({
+  //     status: 200,
+  //     data: list,
+  //   });
+  // });
 
   // 创建短网址，向前端返回短网址，并记录用户信息
   app.post(`${path}/dwz_create`, async (c: Context) => {
     const payload = c.get("jwtPayload") as JwtPayLoad;
-
     const prisma = Prisma(c);
     const { originalUrl } = await c.req.json(); // 从请求体获取原始网址
 
@@ -98,38 +153,106 @@ export default (app: Hono, path: string) => {
     const prisma = Prisma(c);
     const short = c.req.param("short");
 
-    // 查找短网址对应的原网址
-    const link = await prisma.link.findUnique({
-      where: {
-        shortUrl: short,
-      },
-    });
-
-    if (!link) {
-      return c.json({
-        status: 404,
-        message: "短网址不存在",
+    try {
+      // 查找短网址对应的原网址
+      const link = await prisma.link.findUnique({
+        where: {
+          shortUrl: short,
+        },
       });
+
+      if (!link) {
+        return c.json({
+          status: 404,
+          message: "短网址不存在",
+        });
+      }
+
+      const cfReq = c.req.raw as any;
+      const { cf } = cfReq;
+
+      // 记录访问信息
+      try {
+        await prisma.visit.create({
+          data: {
+            linkId: link.id,
+            ipAddress: "未知",
+            country: cf?.country || "未知",
+          },
+        });
+      } catch (error) {
+        console.error("记录访问信息失败:", error);
+      }
+
+      // 返回原网址的 JSON 数据
+      return c.json({
+        status: 200,
+        originalUrl: link.originalUrl,
+      });
+    } catch (e) {
+      console.log(e);
     }
-
-    // 记录访问信息
-    console.log(c.req.header());
-
-    // const ip = c.req.headers.get('cf-connecting-ip') || c.req.headers.get('x-forwarded-for'); // 获取访问者的 IP
-    // const country = c.req.headers.get('cf-ipcountry'); // 获取访问者的国家信息
-
-    // await prisma.visit.create({
-    //   data: {
-    //     linkId: link.id,
-    //     ipAddress: ip,
-    //     country: country,
-    //   },
-    // });
-
-    // 返回原网址的 JSON 数据
-    return c.json({
-      status: 200,
-      originalUrl: link.originalUrl,
-    });
   });
+
+  // 短网址访问信息查询 带分页
+  // 短网址访问信息查询 带分页
+app.get(`${path}/dwz_visits/page`, async (c: Context) => {
+  const page =  1; // 获取页码，默认为1
+  const limit =  10; // 获取每页数量，默认为10
+
+  const prisma = Prisma(c);
+
+  const totalVisits = await prisma.visit.count();
+
+  // 查询访问信息，并包含外键 Link 表的数据
+  const visits = await prisma.visit.findMany({
+    skip: (page - 1) * limit,
+    take: limit,
+    orderBy: { createdAt: 'desc' }, // 按照访问时间降序排列
+    include: {
+      link: { // 包含 Link 表的数据
+        select: {
+          id: true,
+          originalUrl: true,
+          shortUrl: true,
+        },
+      },
+    },
+  });
+
+  return c.json({
+    status: 200,
+    data: {
+      visits,
+      currentPage: page,
+      totalPages: Math.ceil(totalVisits / limit), // 计算总页数
+    },
+  });
+});
+
+  // app.get(`${path}/dwz_visits/page`, async (c: Context) => {
+  //   const page = 1; // 获取页码，默认为1
+  //   const limit =  10; // 获取每页数量，默认为10
+  
+  //   const prisma = Prisma(c);
+  
+  //   const totalVisits = await prisma.visit.count();
+  
+  //   // 查询访问信息
+  //   const visits = await prisma.visit.findMany({
+  //     skip: (page - 1) * limit,
+  //     take: limit,
+  //     orderBy: { createdAt: 'desc' }, // 按照访问时间降序排列
+  //   });
+  
+  //   return c.json({
+  //     status: 200,
+  //     data: {
+  //       visits,
+  //       currentPage: page,
+  //       totalPages: Math.ceil(totalVisits / limit), // 计算总页数
+  //     },
+  //   });
+  // });
+  
 };

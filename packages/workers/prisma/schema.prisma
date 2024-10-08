@@ -34,6 +34,5 @@ model Visit {
   ipAddress   String                           // 访问者IP地址
   country     String                           // 访问者国家
   createdAt   DateTime @default(now())      // 访问时间
-
   link        Link     @relation(fields: [linkId], references: [id]) // 关联链接
 }

@@ -18,3 +18,10 @@ export async function toLink(params) {
     const response = await axiosInstance.get(`/link/dwz/${params}`)
     return response.data
 }
+
+
+// 短网址日志查询
+export async function dwzPage(params) {
+    const response = await axiosInstance.get(`/link/dwz_visits/page`)
+    return response.data
+}

@@ -20,6 +20,8 @@ const loginBtn = async () => {
 
         if (res.status == 200) {
             const token = res.data.token;
+            const userInfo = res.data.userInfo;
+            localStorage.setItem('userInfo', JSON.stringify(userInfo));
             localStorage.setItem('token', token);
             toast.add({ severity: 'success', summary: '登录成功', detail: '请等待3s进入仪表盘。。。', life: 3000 });
             setTimeout(() => {
