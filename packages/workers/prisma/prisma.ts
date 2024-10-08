@@ -5,5 +5,6 @@ import { Context } from "hono";
 export default (c: Context) => {
     const env = c.env as Env; // 确保正确类型
     const adapter = new PrismaD1(env.DB);
-    return new PrismaClient({ adapter });
+    return new PrismaClient({ adapter, log: ['query', 'info', 'warn'] });
 }
+

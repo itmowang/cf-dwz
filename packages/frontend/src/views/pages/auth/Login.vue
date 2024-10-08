@@ -25,7 +25,7 @@ const loginBtn = async () => {
             localStorage.setItem('token', token);
             toast.add({ severity: 'success', summary: '登录成功', detail: '请等待3s进入仪表盘。。。', life: 3000 });
             setTimeout(() => {
-                window.location.href = '/';
+                window.location.href = '/dashboard';
             }, 3000);
         } else {
             toast.add({ severity: 'error', summary: res?.message, detail:res?.message, life: 3000 });

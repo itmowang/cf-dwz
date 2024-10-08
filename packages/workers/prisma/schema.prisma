@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["driverAdapters"]
 }
 
@@ -9,30 +9,30 @@ datasource db {
 }
 
 model User {
-  id          String   @id @default(cuid()) // 用户ID
-  email       String   @unique               // 用户邮箱，唯一
-  password    String                           // 用户密码
-  createdAt   DateTime @default(now())      // 创建时间
-  updatedAt   DateTime @updatedAt            // 更新时间
-  links       Link[]                         // 用户创建的链接
+  id        String   @id @default(cuid()) 
+  email     String   @unique 
+  password  String 
+  createdAt DateTime @default(now()) 
+  updatedAt DateTime @updatedAt 
+  links     Link[] 
 }
 
 model Link {
-  id          String   @id @default(cuid()) // 短链接ID
-  userId      String                           // 用户ID，关联用户
-  originalUrl String                           // 原始网址
-  shortUrl    String   @unique               // 短网址，唯一
-  createdAt   DateTime @default(now())      // 创建时间
-  updatedAt   DateTime @updatedAt            // 更新时间
-  user        User     @relation(fields: [userId], references: [id]) // 关联用户
-  visits      Visit[]                          // 访问记录
+  id          String   @id @default(cuid()) 
+  userId      String? 
+  originalUrl String 
+  shortUrl    String   @unique 
+  createdAt   DateTime @default(now()) 
+  updatedAt   DateTime @updatedAt 
+  user        User?     @relation(fields: [userId], references: [id]) 
+  visits      Visit[] 
 }
 
 model Visit {
-  id          String   @id @default(cuid()) // 访问记录ID
-  linkId      String                           // 短链接ID，关联链接
-  ipAddress   String                           // 访问者IP地址
-  country     String                           // 访问者国家
-  createdAt   DateTime @default(now())      // 访问时间
-  link        Link     @relation(fields: [linkId], references: [id]) // 关联链接
+  id        String   @id @default(cuid())
+  linkId    String 
+  ipAddress String 
+  country   String 
+  createdAt DateTime @default(now()) 
+  link      Link     @relation(fields: [linkId], references: [id]) 
 }

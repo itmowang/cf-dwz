@@ -98,6 +98,54 @@ export default (app: Hono, path: string) => {
   //     data: list,
   //   });
   // });
+  
+  // 创建短网址，向前端返回短网址，不记录用户信息
+  app.post(`${path}/dwz_free_create`, async (c: Context) => {
+    const prisma = Prisma(c);
+    const { originalUrl } = await c.req.json(); // 从请求体获取原始网址
+
+    // 生成短网址
+    const short = shortLink(originalUrl);
+
+    //对比短网址是否已存在
+    const exist = await prisma.link.findUnique({
+      where: {
+        shortUrl: short,
+      },
+    });
+
+    if (exist) {
+      return c.json({
+        status: 400,
+        message: "该短网址已存在,您无法重复创建!详情咨询下管理员",
+      });
+    } else {
+      const params = {
+        originalUrl,
+        shortUrl: short,
+        userId: "000000",
+      };
+
+      const link = await prisma.link.create({
+        data: params,
+      });
+
+      if (link) {
+        return c.json({
+          status: 200,
+          message: "短网址创建成功",
+          data: {
+            shortUrl: link.shortUrl,
+          },
+        });
+      } else {
+        return c.json({
+          status: 500,
+          message: "短网址创建失败",
+        });
+      }
+    }
+  });
 
   // 创建短网址，向前端返回短网址，并记录用户信息
   app.post(`${path}/dwz_create`, async (c: Context) => {

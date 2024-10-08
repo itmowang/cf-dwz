@@ -19,7 +19,7 @@ const items = ref([
             // localStorage.setItem('token', "");
             toast.add({ severity: 'success', summary: '您已经退出登录。。。', detail: '回到登录页', life: 2000 });
             setTimeout(() => {
-                window.location.href = '/';
+                window.location.href = '/auth/login';
             }, 2000);
         }
     },

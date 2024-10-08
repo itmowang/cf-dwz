@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import user from "./src/user";
 import link from "./src/link";
 import info from "./src/info";
+import free from "./src/free";
 import { jwt } from "hono/jwt";
 import { cors } from "hono/cors";
 import { Context } from "vm";
@@ -23,6 +24,7 @@ app.delete("/", (c) => c.text("DELETE /"));
 user(app, "/user");
 link(app, "/link");
 info(app,"/info")
+free(app,"/free")
 
 app.notFound((c) => {
   return c.text("Custom 404 Message", 404);

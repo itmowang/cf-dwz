@@ -33,4 +33,3 @@ CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Link_shortUrl_key" ON "Link"("shortUrl");
-

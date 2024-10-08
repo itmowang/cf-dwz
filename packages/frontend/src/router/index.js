@@ -3,14 +3,21 @@ import { createRouter, createWebHistory } from 'vue-router';
 const router = createRouter({
     history: createWebHistory(),
     routes: [
-        { path: '/:short',name: 'shortUrl', meta: { layout: 'landing',isShort: true } },
+        { path: '/', name: 'indexS', component: () => import('@/views/ShortFree.vue') ,children: [
+            {
+                path: '/',
+                name: 'indexS',
+                component: () => import('@/views/ShortFree.vue')
+            }]
+        },
+        { path: '/index', name: 'index', component: () => import('@/views/ShortFree.vue') },
+        { path: '/:short', name: 'shortUrl', meta: { layout: 'landing', isShort: true } },
         {
-            path: '/',
+            path: '/dashboard',
             component: AppLayout,
             children: [
-
                 {
-                    path: '/',
+                    path: '/dashboard',
                     name: 'dashboard',
                     component: () => import('@/views/Dashboard.vue')
                 },
@@ -71,21 +78,27 @@ const whiteList = ['/auth/login', '/auth/register', '/auth/access', '/auth/error
 
 
 router.beforeEach((to, from) => {
+    if (to.path === '/index' || to.path === '/') {
+        console.log(to);
 
-
-    const token = localStorage.getItem('token');
-   if(whiteList.some((path)=>path == to.path)){
-    return true
-   }else{
-     if(token){
         return true
-     }else{
-        return '/auth/login'
-     }
-   }
+    } else {
+        const token = localStorage.getItem('token');
+        if (whiteList.some((path) => path == to.path)) {
+            return true
+        } else {
+            if (token) {
+                return true
+            } else {
+                return '/auth/login'
+            }
+        }
+    }
+
+
 
 
     return false
-  })
+})
 
 export default router;
