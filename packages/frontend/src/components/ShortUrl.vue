@@ -29,8 +29,8 @@
   onMounted(async () => {
     const res = await toLink(short);
     if (res.status == 200) {
+      loading.value = false;
       setTimeout(() => {
-        loading.value = false;
         window.location.href = res.originalUrl;
       }, 2000);
     }
