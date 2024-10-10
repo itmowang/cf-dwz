@@ -35,7 +35,21 @@ export default (app: Hono, path: string) => {
 
         // 生成短网址
         const short = shortLink(originalUrl);
-           
+        console.log(short);
+        const findShort = await prisma.link.findUnique({
+            where: {
+                shortUrl: short,
+            },
+        })
+        if (findShort) {
+            return c.json({
+                status: 200,
+                message: "短网址已存在",
+                data: {
+                    shortUrl: findShort.shortUrl,
+                },
+            });
+        } else {
             const params = {
                 originalUrl,
                 shortUrl: short,
@@ -59,6 +73,9 @@ export default (app: Hono, path: string) => {
                     message: "短网址创建失败",
                 });
             }
+        }
+
+
     });
 
 }
