@@ -3,7 +3,7 @@ import axios from 'axios';
 // 判断环境来设置baseURL
 const isDev = process.env.NODE_ENV === 'development';
 
-const API_BASE_URL = isDev ? '/api' : 'https://dwzworkers.loli5.workers.dev/api';
+const API_BASE_URL = isDev ? '/api' : 'https://api.dmw.pw/api';
 
 const axiosInstance = axios.create({
     baseURL: API_BASE_URL,
