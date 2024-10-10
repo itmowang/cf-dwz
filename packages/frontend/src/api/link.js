@@ -21,7 +21,7 @@ export async function getLinkList(params) {
 
 // 获取短网址并且跳转的关键接口
 export async function toLink(params) {
-    const response = await axiosInstance.get(`/link/dwz/${params}`)
+    const response = await axiosInstance.get(`/free/dwz/${params}`)
     return response.data
 }
 

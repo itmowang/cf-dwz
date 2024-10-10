@@ -10,8 +10,8 @@ const router = createRouter({
                 component: () => import('@/views/ShortFree.vue')
             }]
         },
-        { path: '/index', name: 'index', component: () => import('@/views/ShortFree.vue') },
         { path: '/:short', name: 'shortUrl', meta: { layout: 'landing', isShort: true } },
+        { path: '/index', name: 'index', component: () => import('@/views/ShortFree.vue') },
         {
             path: '/dashboard',
             component: AppLayout,
@@ -79,17 +79,15 @@ const whiteList = ['/auth/login', '/auth/register', '/auth/access', '/auth/error
 
 router.beforeEach((to, from) => {
     if (to.path === '/index' || to.path === '/') {
-        console.log(to);
-
         return true
     } else {
         const token = localStorage.getItem('token');
-        if (whiteList.some((path) => path == to.path)) {
+        if (whiteList.some((path) => path == to.path) ) {
             return true
         } else {
-            if (token) {
+            if (token || to.meta.isShort ) {
                 return true
-            } else {
+            } else { 
                 return '/auth/login'
             }
         }

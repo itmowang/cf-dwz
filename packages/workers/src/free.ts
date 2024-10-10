@@ -78,4 +78,48 @@ export default (app: Hono, path: string) => {
 
     });
 
+    // 使用 shortUrl 获取到原网址，并记录访问信息
+    app.get(`${path}/dwz/:short`, async (c: Context) => {
+        const prisma = Prisma(c);
+        const short = c.req.param("short");
+        try {
+            // 查找短网址对应的原网址
+            const link = await prisma.link.findUnique({
+                where: {
+                    shortUrl: short,
+                },
+            });
+
+            if (!link) {
+                return c.json({
+                    status: 404,
+                    message: "短网址不存在",
+                });
+            }
+
+            const cfReq = c.req.raw as any;
+            const { cf } = cfReq;
+
+            // 记录访问信息
+            try {
+                await prisma.visit.create({
+                    data: {
+                        linkId: link.id,
+                        ipAddress: "未知",
+                        country: cf?.country || "未知",
+                    },
+                });
+            } catch (error) {
+                console.error("记录访问信息失败:", error);
+            }
+
+            // 返回原网址的 JSON 数据
+            return c.json({
+                status: 200,
+                originalUrl: link.originalUrl,
+            });
+        } catch (e) {
+            console.log(e);
+        }
+    });
 }
